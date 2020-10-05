@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        text-align: center;
+      }
+      #game {
+        margin: 0 auto;
+        cursor: url(./hand.svg) 12.5 12.5, auto;
+        border-collapse: collapse;
+        background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+      }
+      #game td {
+        width: 50px;
+        height: 50px;
+      }
+      .dot {
+        /* width: 50px;
+            height: 50px; */
+        border-radius: 50%;
+        background: url("./money.svg") center center no-repeat,
+          linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+        /* animation: animation 2s 1 ease-in; */
+      }
+      .dot:active {
+        cursor: url(./catch.svg) 12.5 12.5, auto;
+      }
+      .superDot {
+        border-radius: 50%;
+        background: url("./money.svg") center center no-repeat,
+          linear-gradient(-225deg, #69eacb 0%, #eaccf8 48%, #6654f1 100%);
+      }
+      #btn-start {
+        color: #5b92ce;
+        background: transparent;
+        border: 2px solid #a1c4fd;
+        border-radius: 10px;
+        padding: 10px 20px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+        text-decoration: none;
+        outline: none;
+      }
+      #btn-start:hover {
+        color: white;
+        background: #a1c4fd;
+      }
+      .money {
+        color: #e9ba21;
+        font-weight: bold;
+        font-size: 20px;
+      }
+      #text-highscore {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>來尋找神秘金幣吧！</h3>
+    <table id="game">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+    <br />
+    <input type="button" value="開始遊戲" id="btn-start" />
+    <p class="money">剩餘金幣: <span id="text-number">35</span></p>
+    <p>最高紀錄</p>
+    <p>玩家: <span id="text-highplayer"></span></p>
+    <p>花費時間: <span id="text-highscore"></span></p>
+
+    <audio src="'./rihai.mp3" id="rihai"></audio>
+    <script>
+      const btnStart = document.getElementById("btn-start");
+      const holes = document.querySelectorAll("#game td");
+      const textNumber = document.getElementById("text-number");
+      const textHighPlayer = document.getElementById("text-highplayer");
+      const textHighScore = document.getElementById("text-highscore");
+
+      let score = 0;
+      let isInGame = false;
+
+      let timer = 0;
+
+      let highscore = { name: "", sec: "" };
+
+      let sec = 0;
+      let highscoreStorage = JSON.parse(localStorage.getItem("highscore"));
+      if (highscoreStorage != null) {
+        highscore = highscoreStorage;
+        textHighPlayer.innerText = highscore.name;
+        textHighScore.innerText = highscore.sec;
+      }
+
+      btnStart.onclick = () => {
+        for (const hole of holes) {
+          hole.classList.add("dot");
+        }
+        btnStart.disabled = true;
+        number = 35;
+        textNumber.innerText = number;
+        isInGame = true;
+
+        timer = setInterval(second, 1000);
+
+        second();
+      };
+
+      const second = () => {
+        sec++;
+        btnStart.value = `時間過了${sec}秒`;
+      };
+
+      for (const hole of holes) {
+        hole.onclick = () => {
+          if (hole.classList.contains("dot")) {
+            hole.classList.remove("dot");
+
+            number--;
+            textNumber.innerText = number;
+          }
+        };
+      }
+
+      const random = Math.floor(Math.random() * 30);
+      holes[random].onclick = () => {
+        holes[random].classList.remove("dot");
+        holes[random].classList.add("superDot");
+        setTimeout(congrats, 200);
+      };
+
+      const congrats = () => {
+        clearInterval(timer);
+
+        for (const hole of holes) {
+          hole.classList.remove("dot");
+          hole.classList.remove("superDot");
+        }
+        btnStart.disabled = false;
+        alert("恭喜你找到神秘金幣！");
+
+        if (highscoreStorage === null || sec < highscore.sec) {
+          const name = prompt("最快找到神秘金幣! 請輸入名字");
+          highscore.sec = sec;
+
+          highscore.name = name || "player";
+
+          localStorage.setItem("highscore", JSON.stringify(highscore));
+          textHighPlayer.innerText = highscore.name;
+          textHighScore.innerText = highscore.sec;
+        }
+        btnStart.value = "開始遊戲";
+        textNumber.innerText = 35;
+      };
+    </script>
+  </body>
+</html>
